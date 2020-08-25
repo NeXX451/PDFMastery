@@ -22,47 +22,63 @@ def unlock():
 def merge():
     cowsay.cow("I merge")
     print("\n")
-    print("The order with which the PDFs will be merged depends on the numbers. So rename the files in the sequence you wish to merge!\n")
-    print("All PDFs must be named as follows:\n")
-    print("\"i name.pdf\" (i SPACE name.pdf) where i is a number.\n")
-    print("[\"0 name.pdf\", \"1 name.pdf\", \"2 name.pdf\"] is acceptable.\n")
-    print("There shouldn't be any duplicates! [\"0 name.pdf\", \"0 name1.pdf\"], will be accepted, but\n")
-    print("there is no guarantee the pdfs will be merged in the correct order!")
+    print("For merging the files must be sorted in a way you want them to be merged.")
+    print("There are 2 options:")
+    print("1. You will let python decide how to sort the files. For this every filename must begin with a number (min 0, max 999).")
+    print("For this option press (1) when prompted. (RECOMMENDED)")
+    print("2. You don't care about order or correctness. This option merges the files without numbers in the filename.")
+    print("That means the files will be sorted alphabetically. This is not recommended!")
     
-
-    while True:
-        inp = input("Run File name test (y/n): ")
-        if inp == 'y':
-            cwd = os.getcwd()  # Get the current working directory (cwd)
-            files = os.listdir(cwd)  # Get all the files in that directory
-            #print("Files in %r: %s" % (cwd, files))
-            for x in files:
-                if x.endswith('pdf'):
-                    print(x)
-            print("\n")
-            print("\n")
-            print("Wenn alles in Ordnung, druecke (n)")
-        else:
-            break
-
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    files = os.listdir(cwd)  # Get all the files in that directory
-    pdf = Pdf.new()
-
-
-    """ for x in files:
-        if x.endswith("pdf"):
-            fileAr.append(x) """
-    for j in range(len(files)):
-        #print(j)
+    y = input("Select merging option (1/2): ")
+    if y == '1':
+        cwd = os.getcwd()  # Get the current working directory (cwd)
+        files = os.listdir(cwd)  # Get all the files in that directory
+        di ={'1': [],'2':[] , '3':[]}
         for x in files:
-            if x.startswith("{} ".format(j)):
+            if x.endswith("pdf"):
+                try:
+                    int(list(x)[0])
+                    int(list(x)[1])
+                    int(list(x)[2])
+                    di['3'].append(x)
+                except:
+                    try:
+                        int(list(x)[0])
+                        int(list(x)[1])
+                        di['2'].append(x)
+                    except:
+                        try:
+                            int(list(x)[0])
+                            di['1'].append(x)
+                        except:
+                            None
+        pdf = Pdf.new()
+        for xi in di['1']:
+            print(xi)
+            src = Pdf.open(xi)
+            pdf.pages.extend(src.pages)
+        if len(di['2']) >0:
+            for xi in di['2']:
+                print(xi)
+                src = Pdf.open(xi)
+                pdf.pages.extend(src.pages)
+        if len(di['3']) >0:
+            for xi in di['3']:
+                print(xi)
+                src = Pdf.open(xi)
+                pdf.pages.extend(src.pages)
+        pdf.save('merged.pdf')
+    elif y=='2':
+        print("Brave...")
+        cwd = os.getcwd()  # Get the current working directory (cwd)
+        files = os.listdir(cwd)  # Get all the files in that directory
+        pdf = Pdf.new()
+        for x in files:
+            if x.endswith("pdf"):
                 print(x)
                 src = Pdf.open(x)
                 pdf.pages.extend(src.pages)
-                
-    pdf.save('merged.pdf')
-
+        pdf.save('merged.pdf')
 
 def rotate():
     cowsay.cow("I rotate")
@@ -90,7 +106,7 @@ def cut():
             print("Current pdf: {}".format(x))
             lengthPDF = len(pdf.pages)
             print("The PDF has {} pages".format(lengthPDF))
-            print("Enter an interval to be cut from pdf (From and To are inclusive)\n")
+            print("Enter an interval to be cut from pdf (From and To are inclusive)")
             print("If entered 0 0 the pdf will be skipped!")
             intervalX = input("Cut From page: ")
             intervalY = input("To page: ")
@@ -124,7 +140,7 @@ def split():
             print("Current pdf: {}".format(f))
             lengthPD = len(pdf.pages)
             print("The PDF has {} pages.\n".format(lengthPD))
-            print("The split is inclusive the left pdf.\n")
+            print("The split is inclusive the left pdf.")
             print("So Split on 5 means 1 to 5 are one pdf and 6 to 10 (pdf has 10 pages) is the second pdf.")
             intervalX = int(input("Split on page: "))
 
