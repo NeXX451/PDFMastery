@@ -1,25 +1,28 @@
 import os
 from pikepdf import Pdf
-from glob import glob
-
-
+from tkinter import filedialog
+from tkinter import *
 import cowsay
 
-def unlock():
+
+
+
+
+def unlock(fs):
     cowsay.ghostbusters("lul locks... ")
     print("\n")
     password = input("Enter Password: ")
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    files = os.listdir(cwd)  # Get all the files in that directory
-    print("Files in %r: %s" % (cwd, files))
+    os.getcwd
+    files = os.listdir(fs)  # Get all the files in that directory
 
     for x in files:
         if x.endswith("pdf"):
             print(x)
             with Pdf.open(x, password) as pdf:
                 pdf.save(x.replace(".pdf", "(unlocked).pdf")) #
+    
 
-def merge():
+def merge(fs):
     cowsay.cow("I merge")
     print("\n")
     print("For merging the files must be sorted in a way you want them to be merged.")
@@ -31,8 +34,8 @@ def merge():
     
     y = input("Select merging option (1/2): ")
     if y == '1':
-        cwd = os.getcwd()  # Get the current working directory (cwd)
-        files = os.listdir(cwd)  # Get all the files in that directory
+        
+        files = os.listdir(fs)  # Get all the files in that directory
         di ={'1': [],'2':[] , '3':[]}
         for x in files:
             if x.endswith("pdf"):
@@ -70,8 +73,8 @@ def merge():
         pdf.save('merged.pdf')
     elif y=='2':
         print("Brave...")
-        cwd = os.getcwd()  # Get the current working directory (cwd)
-        files = os.listdir(cwd)  # Get all the files in that directory
+        
+        files = os.listdir(fs)  # Get all the files in that directory
         pdf = Pdf.new()
         for x in files:
             if x.endswith("pdf"):
@@ -80,11 +83,11 @@ def merge():
                 pdf.pages.extend(src.pages)
         pdf.save('merged.pdf')
 
-def rotate():
+def rotate(fs):
     cowsay.cow("I rotate")
     print("\n")
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    files = os.listdir(cwd)  # Get all the files in that directory
+    
+    files = os.listdir(fs)  # Get all the files in that directory
     for x in files:
         if x.endswith("pdf"):
             my_pdf = Pdf.open(x)
@@ -93,12 +96,12 @@ def rotate():
                 page.Rotate = int(rot)
             my_pdf.save(x.replace(".pdf", "(rotated{}).pdf".format(rot)))#x.replace(".pdf", "(rotated{}).pdf".format(rot))
 
-def cut():
+def cut(fs):
     cowsay.cow("I cut")
     print("\n")
 
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    files = os.listdir(cwd)  # Get all the files in that directory
+    
+    files = os.listdir(fs)  # Get all the files in that directory
 
     for x in files:
         if x.endswith("pdf"):
@@ -127,13 +130,13 @@ def cut():
             intervalCut = intervalX + "-" + intervalY
             pdfcut.save(x.replace(".pdf", "(cut {}).pdf".format(intervalCut)))
     
-def split():
+def split(fs):
     cowsay.cow("I split")
     print("\n")
 
-    cwd = os.getcwd()  # Get the current working directory (cwd)
-    files = os.listdir(cwd)  # Get all the files in that directory
-
+    
+    files = os.listdir(fs)  # Get all the files in that directory
+    
     for f in files:
         if f.endswith("pdf"):
             pdf = Pdf.open(f)
@@ -167,21 +170,31 @@ if __name__ == '__main__':
     cowsay.stegosaurus("Henlo I do pdf stuff..")
     print("\n")
     print("This is a pdf mastery tool!\n")
+    print("Python will now ask you for the Directory with the PDF files you wish to modify.")
+    input("Press enter to proceed.")
+    
+
+    root = Tk()
+    root.withdraw()
+    fs = str(filedialog.askdirectory()).replace("/","\\")
+    os.chdir(fs)
+    
+    print("Selected Directory: {}".format(fs))
 
     while True:
         action = input("Select operation (unlock/merge/rotate/cut/split/quit): ")
         if action == 'quit':
             break
         if action == 'rotate':
-            rotate()
+            rotate(fs)
         elif action == 'merge':
-            merge()
+            merge(fs)
         elif action == 'unlock':
-            unlock()
+            unlock(fs)
         elif action == 'cut':
-            cut()
+            cut(fs)
         elif action == 'split':
-            split()
+            split(fs)
         else:
             print("Invalid Action!")
 
