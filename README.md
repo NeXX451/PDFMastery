@@ -6,4 +6,4 @@ All the pdf files to be modified must be in the same folder as pdfMastery.py.
 Requirements are:
 python 3. (if possible then use 3.8 on windows because of pikepdf)
 pikepdf
-cowsay
+tkinter
