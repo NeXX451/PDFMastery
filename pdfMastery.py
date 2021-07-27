@@ -159,10 +159,46 @@ def printBT():
             pdfsplit2.save(name.replace(".pdf", "xSplit2.pdf"))
     lblprintBTN.config(text="Done!")
 
+def exclusiveBT():
+    lblexclusiveBTN.config(text="Working!")
+    files = filedialog.askopenfiles()
+    p = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[0]
+    os.chdir(p)
+    for x in files:
+        path = str(x.name).replace("/", "\\")
+        print(path)
+        with Pdf.open(path) as pd:
+            name = path.split("\\")[-1]
+            lengthPDF = len(pd.pages)
+            pr = "Current PDF: {}.\n".format(name)
+            prl = "Has {} pages.\n".format(lengthPDF)
+            prs = "Enter an interval to be cut from pdf (From and To are inclusive).\n"
+            pr0 = "If entered 0 0 the pdf will be skipped!\n"
+            promp = pr + prl + prs + pr0 + "Cut From page:"
+            intervalX = simpledialog.askstring(title="Cut from", prompt=promp)
+            promp2 = pr + prl + "Cutting from page {} ".format(intervalX) +"Cut To page:"
+            intervalY = simpledialog.askstring(title="Cut to", prompt=promp2)
+            if intervalX == '0' and intervalY == '0':
+                continue
+            pdsplit = []
+            for n, page in enumerate(pd.pages):
+                pdsplit.append(page)
+            i = 0
+            pdfcut = Pdf.new()
+            for n, f in enumerate(pdsplit):
+                if (i != int(intervalX) - 1) and (i <= int(intervalX) - 1 or i > int(intervalY) - 1 ):
+                    i += 1
+                else:
+                    pdfcut.pages.append(f)
+                    i += 1
+            intervalCut = intervalX + "-" + intervalY
+            pdfcut.save(name.replace(".pdf", "(cut {}).pdf".format(intervalCut)))
+    lblexclusiveBTN.config(text="Done!")
+
 
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('260x280')
+    root.geometry('260x315')
     root.title('PDF Mastery')
     root['bg'] = '#3c1b7d'
     root.resizable(False, False)
@@ -182,8 +218,11 @@ if __name__ == '__main__':
     cutBTN = Button(root, text="Cut PDFs", command=cutBT)
     cutBTN.grid(row=49, column=0, stick=W, pady=10, padx=50)
 
-    printBTN = Button(root, text="PrintSplit", command=printBT)
+    printBTN = Button(root, text="Print Split", command=printBT)
     printBTN.grid(row=59, column=0, stick=W, pady=10, padx=50)
+
+    exclusiveCUTBTN = Button(root, text="Exclusive Cut", command=exclusiveBT)
+    exclusiveCUTBTN.grid(row=69, column=0, stick=W, pady=10, padx=50)
 
     lblMergeBTN = Label(root, text='', width=10)
     lblMergeBTN.grid(row=9, column=1)
@@ -202,6 +241,9 @@ if __name__ == '__main__':
 
     lblprintBTN = Label(root, text='', width=10)
     lblprintBTN.grid(row=59, column=1)
+
+    lblexclusiveBTN = Label(root, text='', width=10)
+    lblexclusiveBTN.grid(row=69, column=1)
 
     root.mainloop()
 
