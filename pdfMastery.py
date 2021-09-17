@@ -5,10 +5,6 @@ from tkinter import *
 from tkinter import simpledialog
 
 
-##########################################
-#Deine Mutter schreibt Programme in Python.
-##########################################
-
 def mergeBT():
     # fs = str(filedialog.askdirectory()).replace("/","\\")
 
