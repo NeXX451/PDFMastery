@@ -1,8 +1,17 @@
+from concurrent.futures import thread
 import os
+from turtle import width
 from pikepdf import Pdf
 from tkinter import filedialog
 from tkinter import *
 from tkinter import simpledialog
+
+# pdf -> ppt
+from pdf2image import convert_from_path
+from pptx import Presentation
+from pptx.util import Inches
+from PIL import Image
+from io import BytesIO
 
 
 def mergeBT():
@@ -194,10 +203,49 @@ def exclusiveBT():
             pdfcut.save(name.replace(".pdf", "(cut {}).pdf".format(intervalCut)))
     lblexclusiveBTN.config(text="Done!")
 
+def pdf2pptBT():
+    lblpdftopptBTN.config(text="Working!")
+    files = filedialog.askopenfiles()
+    p = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[0]
+    os.chdir(p)
+    for x in files:
+        presentation = Presentation()
+        path = str(x.name).replace("/", "\\")
+        print(path)
+        name = path.split("\\")[-1]
+        print(name)
+        promp1 = "Select DPI, default 600 (over 1000 the program will freak out, recommended 300 - 800)"
+        DPI = simpledialog.askstring(title="DPI", prompt=promp1)
+        promp2 = "Select number of threads, default 4 (recommended 2 - 4)"
+        threads = simpledialog.askstring(title="No. of Threads", prompt=promp2)
+        if DPI == "" and threads != "":
+            si = convert_from_path(name , 600, thread_count=int(threads))    
+        elif DPI == "" and threads == "":
+            si = convert_from_path(name , 600, thread_count=4)
+        else:
+            si = convert_from_path(name , int(DPI), thread_count=int(threads))
+        
+        for i, si in enumerate(si):
+            imgf = BytesIO()
+            si.save(imgf, format='tiff')
+            data = imgf.getvalue()
+            imgf.seek(0)
+            width, height = si.size
+
+            presentation.slide_height = height * 9525
+            presentation.slide_width = width * 9525
+
+            slide = presentation.slides.add_slide(presentation.slide_layouts[6])
+            picture = slide.shapes.add_picture(imgf, 0, 0, width=width * 9525, height=height * 9525)
+        presentation.save(name.replace(".pdf", "(pdf2ppt).ppt"))
+        
+
+    lblpdftopptBTN.config(text="Done!")
+
 
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('260x315')
+    root.geometry('270x365')
     root.title('PDF Mastery')
     root['bg'] = '#3c1b7d'
     root.resizable(False, False)
@@ -223,6 +271,10 @@ if __name__ == '__main__':
     exclusiveCUTBTN = Button(root, text="Exclusive Cut", command=exclusiveBT)
     exclusiveCUTBTN.grid(row=69, column=0, stick=W, pady=10, padx=50)
 
+    pdftopptxBTN = Button(root, text="PDF -> PPT", command=pdf2pptBT)
+    pdftopptxBTN.grid(row=79, column=0, stick=W, pady=10, padx=50)
+
+
     lblMergeBTN = Label(root, text='', width=10)
     lblMergeBTN.grid(row=9, column=1)
 
@@ -243,6 +295,9 @@ if __name__ == '__main__':
 
     lblexclusiveBTN = Label(root, text='', width=10)
     lblexclusiveBTN.grid(row=69, column=1)
+
+    lblpdftopptBTN = Label(root, text='', width=10)
+    lblpdftopptBTN.grid(row=79, column=1)
 
     root.mainloop()
 

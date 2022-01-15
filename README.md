@@ -5,15 +5,20 @@
 - All the pdf files to be modified must be in the same folder as pdfMastery.py.
 
 - Requirements are (if you want to use source code):
-  python 3. (if possible then use 3.8 on windows because of pikepdf)
+  python 3. 
   pikepdf
   tkinter
 
 - To create an exe 
 
   ```bash
-  pyinstaller --noconfirm --onefile --windowed --hidden-import "pikepdf._cpphelpers" pdfMastery.py
+  pyinstaller --noconfirm --onefile --console --log-level "ERROR" --debug "all" --add-data ~/Python/Python310/Lib/site-packages/pptx;pptx/ pdfMastery.py
   ```
 
+  or use with pptx
   
-
+  ```bash
+  auto-py-to-exe
+  ```
+  
+  
