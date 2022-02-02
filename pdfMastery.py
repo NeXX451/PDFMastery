@@ -6,11 +6,15 @@ from tkinter import filedialog
 from tkinter import *
 from tkinter import simpledialog
 
+import img2pdf
+import PIL.Image
+import io
+
 # pdf -> ppt
 from pdf2image import convert_from_path
 from pptx import Presentation
 from pptx.util import Inches
-from PIL import Image
+
 from io import BytesIO
 
 
@@ -242,10 +246,35 @@ def pdf2pptBT():
 
     lblpdftopptBTN.config(text="Done!")
 
+def img2pdfBT():
+    lblimgtopdfBTN.config(text="Working!")
+    path = filedialog.askdirectory()
+    mname = simpledialog.askstring(title="Name", prompt="Enter prefix name.")
+    for root, dirs, files in os.walk(path):
+        lst = []
+        for x in files:
+            if x.endswith((".jpg",".png")):
+                print(root +"/"+ x)
+            
+                image = PIL.Image.open(str(root +"/"+ x).replace("/", "\\"))
+                pdf_bytes = img2pdf.convert(image.filename)
+                f = io.BytesIO(pdf_bytes)
+                lst.append(f)
+
+                image.close()
+            
+        pdf = Pdf.new()
+        for y in lst:
+            with Pdf.open(y) as pd:
+                pdf.pages.extend(pd.pages)
+        rootname = str(root).replace("/", "\\")
+        nameoffile = str(rootname + "_" + str(mname)+".pdf")
+        pdf.save(nameoffile)
+    lblimgtopdfBTN.config(text="Done!")
 
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('270x365')
+    root.geometry('270x435')
     root.title('PDF Mastery')
     root['bg'] = '#3c1b7d'
     root.resizable(False, False)
@@ -274,6 +303,9 @@ if __name__ == '__main__':
     pdftopptxBTN = Button(root, text="PDF -> PPT", command=pdf2pptBT)
     pdftopptxBTN.grid(row=79, column=0, stick=W, pady=10, padx=50)
 
+    imgtopdfBTN = Button(root, text="Img -> PDF", command=img2pdfBT)
+    imgtopdfBTN.grid(row=89, column=0, stick=W, pady=10, padx=50)
+
 
     lblMergeBTN = Label(root, text='', width=10)
     lblMergeBTN.grid(row=9, column=1)
@@ -298,6 +330,9 @@ if __name__ == '__main__':
 
     lblpdftopptBTN = Label(root, text='', width=10)
     lblpdftopptBTN.grid(row=79, column=1)
+
+    lblimgtopdfBTN = Label(root, text='', width=10)
+    lblimgtopdfBTN.grid(row=89, column=1)
 
     root.mainloop()
 
