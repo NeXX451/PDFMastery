@@ -272,9 +272,67 @@ def img2pdfBT():
         pdf.save(nameoffile)
     lblimgtopdfBTN.config(text="Done!")
 
+import re
+# https://blog.codinghorror.com/sorting-for-humans-natural-sort-order/
+def sort_nicely( l ):
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return l.sort(key=alphanum_key)
+
+def mergechaptersBT():
+    lblmrgchapBTN.config(text="Working!")
+    path = filedialog.askdirectory()
+    os.chdir(path)
+    nametolookfor = simpledialog.askstring(title="Part of string to look for", prompt="Enter substring to look for in file names. This will remove the part before the string (inclusive the string),\n eg. NAME Ch. 111 xyz.pdf -> 111 xyz.pdf\n If none type NONE and hit enter. NONE assumes correct naming for sorting order:")
+    l = []
+    for root, dirs, files in os.walk(path):
+        for x in files:
+            if nametolookfor != "NONE":
+                if x.endswith("pdf") and x.find(nametolookfor) >= 0:
+                    print(x.rsplit(nametolookfor)[1])
+                    os.rename(x, x.rsplit(nametolookfor)[1])
+                    l.append(x)
+
+            else:
+                l.append(x)
+
+    sort_nicely(l)
+
+    count = simpledialog.askinteger(title="Select count to merge", prompt="Choose how many chapters to merge:")
+    name = simpledialog.askstring(title="Name of merged file", prompt="Enter the name of the merged file to be saved:")
+    i = 0
+    pdf = Pdf.new()
+    j = 1
+    for x in l:
+        if str(x).endswith(".pdf"):
+            i += 1
+            with open('chapters.txt', 'a') as f:
+                print(x,file=f)   
+            print(x)
+            with Pdf.open(x) as pd:
+                pdf.pages.extend(pd.pages)
+            if i > count:
+                pdf.save(str(name+ str(j) +".pdf"))
+                pdf = Pdf.new()
+                i = 0
+                j+= 1
+                with open('chapters.txt', 'a') as f:
+                    print(file=f)
+                    print(j,file=f)
+                    print("-----------------------------------------------------------------------------",file=f)
+                    print(file=f)
+                print()
+                print(j)
+                print("-----------------------------------------------------------------------------")
+                print()
+    if i != count:
+        pdf.save(str(name+ str(j) +".pdf"))
+    lblmrgchapBTN.config(text="Done!")
+
+
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('270x435')
+    root.geometry('270x445')
     root.title('PDF Mastery')
     root['bg'] = '#3c1b7d'
     root.resizable(False, False)
@@ -306,6 +364,8 @@ if __name__ == '__main__':
     imgtopdfBTN = Button(root, text="Img -> PDF", command=img2pdfBT)
     imgtopdfBTN.grid(row=89, column=0, stick=W, pady=10, padx=50)
 
+    mrgchapBTN = Button(root, text="Bulk mrg chapt", command=mergechaptersBT)
+    mrgchapBTN.grid(row=99, column=0, stick=W, pady=10, padx=50)
 
     lblMergeBTN = Label(root, text='', width=10)
     lblMergeBTN.grid(row=9, column=1)
@@ -333,6 +393,9 @@ if __name__ == '__main__':
 
     lblimgtopdfBTN = Label(root, text='', width=10)
     lblimgtopdfBTN.grid(row=89, column=1)
+
+    lblmrgchapBTN = Label(root, text='', width=10)
+    lblmrgchapBTN.grid(row=99, column=1)
 
     root.mainloop()
 
