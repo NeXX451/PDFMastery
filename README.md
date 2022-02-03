@@ -1,11 +1,9 @@
 # PDF Mastery
 - This is a simple Python Script to "edit" pdf files. It can unlock them, if they are password protected.
-  It can merge, rotate, cut and split pdf files.
-
-- All the pdf files to be modified must be in the same folder as pdfMastery.py.
+  It can merge, rotate, cut and split pdf files,...
 
 - Requirements are (if you want to use source code):
-  python 3. 
+  python 3.10 
   pikepdf
   tkinter
 
