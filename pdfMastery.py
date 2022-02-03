@@ -291,40 +291,44 @@ def mergechaptersBT():
                 if x.endswith("pdf") and x.find(nametolookfor) >= 0:
                     print(x.rsplit(nametolookfor)[1])
                     os.rename(x, x.rsplit(nametolookfor)[1])
-                    l.append(x)
+                    #l.append(x)
 
             else:
-                l.append(x)
+                #l.append(x)
+                next
 
-    sort_nicely(l)
+    #sort_nicely(l)
 
     count = simpledialog.askinteger(title="Select count to merge", prompt="Choose how many chapters to merge:")
     name = simpledialog.askstring(title="Name of merged file", prompt="Enter the name of the merged file to be saved:")
     i = 0
     pdf = Pdf.new()
     j = 1
-    for x in l:
-        if str(x).endswith(".pdf"):
-            i += 1
-            with open('chapters.txt', 'a') as f:
-                print(x,file=f)   
-            print(x)
-            with Pdf.open(x) as pd:
-                pdf.pages.extend(pd.pages)
-            if i > count:
-                pdf.save(str(name+ str(j) +".pdf"))
-                pdf = Pdf.new()
-                i = 0
-                j+= 1
+    #for x in l:
+    for root, dirs, files in os.walk(path):
+        sort_nicely(files)
+        for x in files:
+            if str(x).endswith(".pdf"):
+                i += 1
                 with open('chapters.txt', 'a') as f:
-                    print(file=f)
-                    print(j,file=f)
-                    print("-----------------------------------------------------------------------------",file=f)
-                    print(file=f)
-                print()
-                print(j)
-                print("-----------------------------------------------------------------------------")
-                print()
+                    print(x,file=f)   
+                print(x)
+                with Pdf.open(x) as pd:
+                    pdf.pages.extend(pd.pages)
+                if i > count:
+                    pdf.save(str(name+ str(j) +".pdf"))
+                    pdf = Pdf.new()
+                    i = 0
+                    j+= 1
+                    with open('chapters.txt', 'a') as f:
+                        print(file=f)
+                        print(j,file=f)
+                        print("-----------------------------------------------------------------------------",file=f)
+                        print(file=f)
+                    print()
+                    print(j)
+                    print("-----------------------------------------------------------------------------")
+                    print()
     if i != count:
         pdf.save(str(name+ str(j) +".pdf"))
     lblmrgchapBTN.config(text="Done!")
