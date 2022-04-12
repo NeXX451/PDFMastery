@@ -41,11 +41,11 @@ def unlockBT():
     files = filedialog.askopenfiles()
     p = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[0]
     os.chdir(p)
-    password = simpledialog.askstring(title="Password", prompt="Enter Password")
+    passw = simpledialog.askstring(title="Password", prompt="Enter Password")
     for x in files:
         path = str(x.name).replace("/", "\\")
         print(path)
-        with Pdf.open(path, password) as pd:
+        with Pdf.open(path, password=passw) as pd:
             pd.save(path.split()[-1].replace(".pdf", "(unlocked).pdf"))
     lblUnlockBTN.config(text="Done!")
 
@@ -246,6 +246,8 @@ def pdf2pptBT():
 
     lblpdftopptBTN.config(text="Done!")
 
+
+## extractor for mergechapters
 def img2pdfBT():
     lblimgtopdfBTN.config(text="Working!")
     path = filedialog.askdirectory()
