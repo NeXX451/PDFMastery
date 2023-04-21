@@ -10,7 +10,7 @@
 - To create an exe 
 
   ```bash
-  pyinstaller --noconfirm --onefile --console --log-level "ERROR" --add-data "C:/Users/hoshi/AppData/Local/Programs/Python/Python310/Lib/site-packages/pptx;pptx/" pdfMastery.py
+  pyinstaller --noconfirm --onefile --console --log-level "ERROR" --add-data "C:/Users/NAME/AppData/Local/Programs/Python/Python310/Lib/site-packages/pptx;pptx/" pdfMastery.py
   ```
 
   or use with pptx
