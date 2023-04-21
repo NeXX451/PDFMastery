@@ -9,6 +9,8 @@ from tkinter import simpledialog
 import img2pdf
 import PIL.Image
 import io
+from pdf2image import convert_from_path
+ 
 
 # pdf -> ppt
 from pdf2image import convert_from_path
@@ -254,6 +256,7 @@ def img2pdfBT():
     mname = simpledialog.askstring(title="Name", prompt="Enter prefix name.")
     for root, dirs, files in os.walk(path):
         lst = []
+        sort_nicely(files)
         for x in files:
             if x.endswith((".jpg",".png")):
                 print(root +"/"+ x)
@@ -270,9 +273,23 @@ def img2pdfBT():
             with Pdf.open(y) as pd:
                 pdf.pages.extend(pd.pages)
         rootname = str(root).replace("/", "\\")
-        nameoffile = str(rootname + "_" + str(mname)+".pdf")
+        nameoffile = str(rootname + "/" + str(mname)+".pdf")
         pdf.save(nameoffile)
     lblimgtopdfBTN.config(text="Done!")
+
+
+def pdf2imgBT():
+    lblpdf2imgBTN.config(text="Working!")
+    files = filedialog.askopenfiles()
+    p = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[0]
+    os.chdir(p)
+    filename = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[1]
+    images = convert_from_path(filename, int(150))
+    for i in range(len(images)):
+        page = 'page'+ str(i) +'.png'
+        images[i].save(page, 'PNG')
+        print(page)
+    lblpdf2imgBTN.config(text="Done!")
 
 import re
 # https://blog.codinghorror.com/sorting-for-humans-natural-sort-order/
@@ -335,12 +352,47 @@ def mergechaptersBT():
         pdf.save(str(name+ str(j) +".pdf"))
     lblmrgchapBTN.config(text="Done!")
 
+def reducePDFsize():
+    lblreduceBTN.config(text="Working!")
+    files = filedialog.askopenfiles()
+    p = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[0]
+    os.chdir(p)
+    filename = str(files[0].name).replace("/", "\\").rsplit('\\', 1)[1]
+    images = convert_from_path(filename, int(150))
+    pngs = []
+    for i in range(len(images)):
+        page = 'page'+ str(i) +'.png'
+        images[i].save(page, 'PNG')
+        print(page)
+        pngs.append(page)
+    lst = []
+    for root, dirs, files in os.walk(p):
+        for x in files:
+            if x.endswith((".jpg",".png")):
+                image = PIL.Image.open(str(root +"/"+ x).replace("/", "\\"))
+                pdf_bytes = img2pdf.convert(image.filename)
+                f = io.BytesIO(pdf_bytes)
+                lst.append(f)
+
+                image.close()
+            
+    pdf = Pdf.new()
+    for y in lst:
+        with Pdf.open(y) as pd:
+            pdf.pages.extend(pd.pages)
+
+    nameoffile = str("reduced" +".pdf")
+    pdf.save(nameoffile)
+    for x in pngs:
+        os.remove(x)
+    lblreduceBTN.config(text="Done!")
+
 
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('270x445')
+    root.geometry('290x550')
     root.title('PDF Mastery')
-    root['bg'] = '#3c1b7d'
+    root['bg'] = '#000000'
     root.resizable(False, False)
 
     mergeBTN = Button(root, text="Merge PDFs", command=mergeBT)
@@ -373,6 +425,12 @@ if __name__ == '__main__':
     mrgchapBTN = Button(root, text="Bulk mrg chapt", command=mergechaptersBT)
     mrgchapBTN.grid(row=99, column=0, stick=W, pady=10, padx=50)
 
+    pdf2imgBTN = Button(root, text="pdf -> img", command=pdf2imgBT)
+    pdf2imgBTN.grid(row=109, column=0, stick=W, pady=10, padx=50)
+    
+    reduceBTN = Button(root, text="reduce size", command=reducePDFsize)
+    reduceBTN.grid(row=119, column=0, stick=W, pady=10, padx=50)
+
     lblMergeBTN = Label(root, text='', width=10)
     lblMergeBTN.grid(row=9, column=1)
 
@@ -402,6 +460,12 @@ if __name__ == '__main__':
 
     lblmrgchapBTN = Label(root, text='', width=10)
     lblmrgchapBTN.grid(row=99, column=1)
+
+    lblpdf2imgBTN = Label(root, text='', width=10)
+    lblpdf2imgBTN.grid(row=109, column=1)
+
+    lblreduceBTN = Label(root, text='', width=10)
+    lblreduceBTN.grid(row=119, column=1)
 
     root.mainloop()
 
