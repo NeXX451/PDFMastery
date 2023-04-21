@@ -367,6 +367,7 @@ def reducePDFsize():
         pngs.append(page)
     lst = []
     for root, dirs, files in os.walk(p):
+        sort_nicely(files)
         for x in files:
             if x.endswith((".jpg",".png")):
                 image = PIL.Image.open(str(root +"/"+ x).replace("/", "\\"))
